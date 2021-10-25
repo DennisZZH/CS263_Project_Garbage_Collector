@@ -6,8 +6,65 @@ written in a simple, self-developed programing language L2.
 
 ## L2 Language Concrete Syntax
 
-TODO
 
+
+### Example Program
+
+```
+struct %tree {
+
+  int value; 
+  %tree left; 
+  %tree right;
+
+};
+
+def insert(%tree node, int value) : int {
+  if (value <= node.value) {
+    if (node.left = nil) {
+      node.left := new %tree; 
+      node.left.value := value;
+    } else { insert(node.left, value); } 
+  } else {
+    if (node.right = nil) {
+      node.right := new %tree;
+      node.right.value := value;
+    } else { insert(node.right, value); } 
+  }
+  return 0;
+}
+
+def find(%tree node, int value) : %tree {
+  %tree retval;
+  if (node.value = value) { retval := node; } 
+  else {
+    if (value < node.value) {
+      if (node.left = nil) { retval := nil; }
+      else { retval := find(node.left, value); }
+    }
+    else {
+      if (node.right = nil) { retval := nil; }
+      else { retval := find(node.right, value); } 
+    }
+  }
+  return retval;
+}
+
+%tree root; 
+%tree node; 
+int dummy;
+
+root := new %tree;
+root.value := 0;
+
+dummy := insert(root, -42); 
+dummy := insert(root, 42);
+
+node := find(root, 42);
+
+output node.value;
+
+```
 
 ## x86 Resources
 
