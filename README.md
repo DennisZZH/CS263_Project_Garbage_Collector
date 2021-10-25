@@ -6,7 +6,7 @@ written in a simple, self-developed programing language L2.
 
 ## L2 Language Concrete Syntax
 
-See L2-concrete-syntax.pdf
+See https://github.com/DennisZZH/CS263_Project_Garbage_Collector/blob/main/L2-concrete-syntax.pdf
 
 ## x86 Resources
 
