@@ -8,6 +8,16 @@ written in a simple, self-developed programing language L2.
 
 See https://github.com/DennisZZH/CS263_Project_Garbage_Collector/blob/main/L2-concrete-syntax.pdf
 
+## L2 Compiler Front End
+
+The front end consists of a lexer that turn a L2 program into a sequence of tokens, and a 
+recursive descent parser that further parse the sequence of tokens into an abstract syntax tree.
+
+## L2 Compiler Back End
+
+The back end consists of a code generator that takes an abstract syntax tree as input and 
+generates a list of x86 assembly instructions.
+
 ## x86 Resources
 
 Here are some resources on x86. Also there are some notes about x86
