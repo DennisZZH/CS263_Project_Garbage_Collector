@@ -28,9 +28,9 @@ with markers for registers (like EAX is denoted with `%eax`) and
 constants (e.g., 0 is `$0`).
 
 - x86 Assembly Wikibook: https://en.wikibooks.org/wiki/X86_Assembly
-- An x86 instruction reference, you will not need most of the
+- An x86 instruction reference, we do not need most of the
   instructions here but it is useful for checking out how the
-  instructions you want to use work: https://c9x.me/x86/
+  instructions work: https://c9x.me/x86/
   
 ## Semi Space Garbage Collector
 
