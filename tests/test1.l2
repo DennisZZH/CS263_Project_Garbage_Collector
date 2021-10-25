@@ -1,0 +1,31 @@
+// SIZE | COLLECTIONS
+// -----+-------------
+//   60 | 0 [], OK
+//   36 | 1 [2 obj, 6 words], OK
+//   30 | 3 [3 obj, 9 words]x3, OK
+//   24 | 3 [2 obj, 6 words]x3, OK
+//   18 | 1 [3 obj, 9 words], OOM
+//   12 | 1 [2 obj, 6 words], OOM
+
+struct %list { int num; %list next; };
+
+def foo() : int {
+  %list bar;
+  bar := new %list;
+  bar.next := new %list;
+  return 0;
+}
+
+%list head;
+int cntr;
+int dummy;
+
+head := new %list;
+head.next := new %list;
+
+while (cntr < 4) {
+  dummy := foo();
+  cntr := cntr + 1;
+}
+
+output 42;

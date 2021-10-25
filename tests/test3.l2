@@ -1,0 +1,34 @@
+// SIZE | COLLECTIONS
+// -----+-------------
+//   32 | 0 [], OK
+//   24 | 1 [2 objects, 4 words], OK
+//   20 | 2 [3 objects, 6 words]x2, OK
+//   16 | 2 [2 objects, 4 words]x2, OK
+//   12 | 1 [3 objects, 6 words], OOM
+
+struct %node {
+  %node ptr;
+};
+
+def createCycle() : %node {
+  %node n1;
+  %node n2;
+
+  n1 := new %node;
+  n2 := new %node;
+
+  n1.ptr := n2;
+  n2.ptr := n1;
+
+  return n1;
+}
+
+%node n;
+int cntr;
+
+while (cntr < 4) {
+  n := createCycle();
+  cntr := cntr + 1;
+}
+
+output 42;

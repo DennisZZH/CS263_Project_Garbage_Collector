@@ -1,0 +1,75 @@
+// SIZE | COLLECTIONS
+// -----+-------------
+//  104 | 0 [], OK
+//   80 | 1 [4 objects, 16 words], OK
+//   56 | 2 [4 objects, 16 words]x2, OK
+//   52 | 1 [6 objects, 24 words], OOM
+
+struct %tree {
+  int value;
+  %tree left;
+  %tree right;
+};
+
+def insert(%tree node, int value) : int {
+  int dummy;
+  if (value <= node.value) {
+    if (node.left = nil) {
+      node.left := new %tree;
+      node.left.value := value;
+    } else { dummy := insert(node.left, value); }
+  } else {
+    if (node.right = nil) {
+      node.right := new %tree;
+      node.right.value := value;
+    } else { dummy := insert(node.right, value); }
+  }
+  return 0;
+}
+
+def find(%tree node, int value) : %tree {
+  %tree retval;
+  if (node.value = value) { retval := node; }
+  else {
+    if (value < node.value) {
+      if (node.left = nil) { retval := nil; }
+      else { retval := find(node.left, value); }
+    }
+    else {
+      if (node.right = nil) { retval := nil; }
+      else { retval := find(node.right, value); }
+    }
+  }
+  return retval;
+}
+
+%tree root;
+%tree node;
+int dummy;
+
+root := new %tree;
+root.value := 0;
+
+dummy := insert(root, -42);
+dummy := insert(root, 42);
+dummy := insert(root, 21);
+dummy := insert(root, -21);
+dummy := insert(root, -84);
+dummy := insert(root, 84);
+
+root.left := nil;
+
+dummy := insert(root, -42);
+dummy := insert(root, -21);
+dummy := insert(root, -84);
+
+root.right := nil;
+
+dummy := insert(root, 42);
+dummy := insert(root, 21);
+dummy := insert(root, 84);
+
+
+node := find(root, 42);
+
+output node.value;
