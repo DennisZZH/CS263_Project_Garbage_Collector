@@ -1,35 +1,31 @@
-# CS 160 Assignment 4: Garbage Collector for L2
+# Project: Garbage Collectors for A Simple Progaming Language L2
 
-**Assignment due: Friday, May 22 11:59 PM**
+In this Project, we are going to implement a semi-space garbage collector, a
+mark-sweep garbage collector and a generational garbage collector for programs
+written in a simple, self-developed programing language L2.
 
-Read [The course description post on
-Slack](https://cs160spring20.slack.com/archives/C010B82M9KL/p1585378023017500)
-for late submission and slip day policy.
+## L2 Language Concrete Syntax
 
-In this assignment, you are going to implement a semi-space garbage
-collector for L2 programs.
+See L2-concrete-syntax.pdf
 
-## What is provided
+## x86 Resources
 
-We provide you with some pre-compiled assembly programs along with L2
-source code so that you can test your garbage collector.
+Here are some resources on x86. Also there are some notes about x86
+below.
 
-The comments in the beginning of each L2 program indicates how many
-collections should happen and how many words and objects should be in
-the live space.
+*Important note:* We are using the AT&T/GAS syntax, which is the one
+with markers for registers (like EAX is denoted with `%eax`) and
+constants (e.g., 0 is `$0`).
 
-After the slip day period has passed, we will provide our compiler
-implementation for L2 so that you can test your garbage collector with
-arbitrary L2 programs.
+- x86 Assembly Wikibook: https://en.wikibooks.org/wiki/X86_Assembly
+- An x86 instruction reference, you will not need most of the
+  instructions here but it is useful for checking out how the
+  instructions you want to use work: https://c9x.me/x86/
+  
+## Semi Space Garbage Collector
 
-We also provide you with the bootstrap code that runs the given L2
-program and provides a hook for your memory allocator and a hook for you
-to call to collect GC statistics.
-
-## What you need to implement
-
-You need to implement the garbage collector class `GcSemiSpace`. The
-interfaces you need to implement are the constructor and the `Alloc`
+We implemented the semi-space garbage collector in class `GcSemiSpace`. The
+interfaces we implemented are the constructor and the `Alloc`
 method.
 
 The constructor takes the frame pointer for the base of the stack and size of
@@ -59,24 +55,6 @@ live objects after garbage collection (the garbage collector will need to
 compute this information each time it's run). We will use this information to
 test and grade your garbage collector.
 
-## Invariants you may want to check
-
-Garbage collectors are finicky and debugging one without much information can
-get complicated. We suggest using a debugger to investigate error states and
-using defensive programming techniques to check invariants about your garbage
-collector and memory model through assertions, and printing statistics whenever
-you feel like they would help. You can create assertions using the `assert`
-command, such as:
-
-```
-assert(some_predicate_that_should_be_true &&
-    "some error message to print if the assert fails.");
-```
-
-This assert will evaluate the given predicate; if it is true then execution
-proceeds as normal, otherwise execution halts and the error message is printed.
-Here are some invariants that may be useful to check:
-
 ### Constructor
 
 Preconditions:
@@ -103,13 +81,7 @@ Preconditions:
   the interval `[stack_ptr, base_frame_ptr]`, this interval is
   backwards because the stack grows downward.
 
-## Copying phase
-
-- Each heap pointer passed to the copy function should point to
-  somewhere in the from space (i.e. the interval `[start of from
-  space, start of from space + semispace size)`).
-
-## How to build the assignment
+## How to build the project
 
 We use 32-bit GCC 8.4.0 toolchain (including GNU assembler) and the
 Makefile is set up to be used with GCC 8. All of the necessary tools
@@ -149,17 +121,7 @@ The `Makefile` provided to you uses `g++` as the C++ compiler. We will
 use `g++` to compile your code on GradeScope. The template we provided
 works on CSIL as is so you do not need to change the compiler on CSIL.
 
-For an explanation of the commands above, you can look at the
-README.md file in assignment 3 template.
-
-## How to test your garbage collector
-
-After implementing your garbage collector, make sure that you are
-calling `ReportGCStats` function. We will use this function for
-testing and grading purposes. The version of `ReportGCStats` function
-we provide you uses the standard error but the GradeScope version will
-use some other mechanism for output so you can print extra debug
-information to standard output or standard error.
+## How to test the garbage collector
 
 After assembling and linking a test program, you can run it as follows:
 
@@ -228,36 +190,11 @@ terminate called after throwing an instance of 'OutOfMemoryError'
 
 Here, the lines starting with `%` are shell command prompts.
 
-### Testing via GradeScope
+## Mark Sweep Garbage Collector
+TODO
 
-Later this week, we will enable submission via GradeScope and your
-assignments will be tested against a more comprehensive test
-suite. Auto-grader on GradeScope will give you feedback on your
-assignment as well. You will be able to submit your assignment
-multiple times and get feedback before submitting a final solution.
+## Generational Garbage Collector
+TODO
 
-We will explain the details on the auto-grader once it is online.
 
-## x86 Resources
 
-Here are some resources on x86. Also there are some notes about x86
-below.
-
-*Important note:* We are using the AT&T/GAS syntax, which is the one
-with markers for registers (like EAX is denoted with `%eax`) and
-constants (e.g., 0 is `$0`).
-
-- x86 Assembly Wikibook: https://en.wikibooks.org/wiki/X86_Assembly
-- An x86 instruction reference, you will not need most of the
-  instructions here but it is useful for checking out how the
-  instructions you want to use work: https://c9x.me/x86/
-
-## What to submit
-
-You are going to submit your whole assignment through GradeScope. We
-are going to consider only your changes to `gc.cpp` and `gc.h` while
-grading and ignore changes in other files and additional files. We are
-going to clarify submission instructions once GradeScope is online.
-
-Your submitted `gc.h` and `gc.cpp` need to compile with the bootstrap
-code given to you, otherwise you automatically fail the assignment.
