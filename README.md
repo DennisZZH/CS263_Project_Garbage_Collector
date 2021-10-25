@@ -34,9 +34,8 @@ constants (e.g., 0 is `$0`).
   
 ## Semi Space Garbage Collector
 
-We implemented the semi-space garbage collector in class `GcSemiSpace`. The
-interfaces we implemented are the constructor and the `Alloc`
-method.
+We implemented a semi-space garbage collector for L2 in class `GcSemiSpace`. The
+interfaces we implemented are the constructor and the `Alloc` method.
 
 The constructor takes the frame pointer for the base of the stack and size of
 the whole heap in terms of words. It should keep track of the given stack base
