@@ -34,7 +34,7 @@ constants (e.g., 0 is `$0`).
   
 ## Semi Space Garbage Collector
 
-We implemented a semi-space garbage collector for L2 in class `GcSemiSpace`. The
+This is a semi-space garbage collector for L2 in class `GcSemiSpace`. The
 interfaces we implemented are the constructor and the `Alloc` method.
 
 The constructor takes the frame pointer for the base of the stack and size of
@@ -68,7 +68,31 @@ test and evaluate the garbage collector.
 
   
 ## Mark Sweep Garbage Collector
-TODO
+This is a Mark Sweep garbage collector for L2 in class `GcMarkSweep`. The
+interfaces we implemented are the constructor and the `Alloc` method.
+
+The constructor will take the base stake pointer and the heap size. 
+It will allocate the heap memory for the L2 program as an array of bytes.
+A free list will be used to manage the available memory.
+
+The `Alloc` method alloacate an object with the given number of words. It
+follows the same interface bewteen compiler and garbage collector. When there
+is not enough space on allocated heap space for the new object, it will walk the stack and identify
+the rootset. Start from the root set, trace all reachable objects in memory and
+mark them as live. Then do a sweep through the entire allocated heap space and any memory that
+is not marked gets freed and returned to the freelist.
+
+After a garbage collection is finished, the garbage collector should call the
+`ReportGCStats` function to report the number and the total size in words of
+live objects after garbage collection. 
+
+Note that using a freelist for memory managenent will cause external fregementation.
+A function needs to be called periodically to coalesce free memory. To do so efficiently 
+requires that each block of memory is marked as free or allocated, which requires more 
+meta-data—otherwise we don’t know whether the abutting block (as opposed to the next block in the freelist)
+is free or not. Also we cannot coalesce memory by moving allocated regions of memory around,
+this would invalidate the addresses being used by the executing program.
+
 
 ## Generational Garbage Collector
 TODO
