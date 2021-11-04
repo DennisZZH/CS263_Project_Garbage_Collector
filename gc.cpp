@@ -110,7 +110,7 @@ void GcSemiSpace::copy_space_on_rootset() {
         *root_ptr = (intptr_t) to_obj_ptr;
 
       } else {
-        memcpy(bump_ptr, from_obj_ptr - 1, 4*(num_words + 1));
+        memcpy(bump_ptr, from_obj_ptr - 1, 4 * (num_words + 1));
 
         num_obj_copied++;
         num_word_copied = num_word_copied + num_words + 1;
