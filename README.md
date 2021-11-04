@@ -89,6 +89,18 @@ Preconditions:
   the base frame pointer and the stack pointer (i.e. it should be in
   the interval `[stack_ptr, base_frame_ptr]`, this interval is
   backwards because the stack grows downward.
+  
+### Copying phase
+
+- Each heap pointer passed to the copy function should point to
+  somewhere in the from space (i.e. the interval `[start of from
+  space, start of from space + semispace size)`).
+  
+## Mark Sweep Garbage Collector
+TODO
+
+## Generational Garbage Collector
+TODO
 
 ## How to build the project
 
@@ -198,12 +210,3 @@ terminate called after throwing an instance of 'OutOfMemoryError'
 ```
 
 Here, the lines starting with `%` are shell command prompts.
-
-## Mark Sweep Garbage Collector
-TODO
-
-## Generational Garbage Collector
-TODO
-
-
-
