@@ -46,55 +46,26 @@ pointers to the `from` & `to` spaces.
 The `Alloc` method allocates an object with the given number of words. It should
 allocate `num_words+1` words and return a pointer to the second word in the
 chunk. This is because the first word is going to be used as the tag for the
-object. See the lecture notes for the interface between the compiler and the
-garbage collector. If there is not enough space for the new object in from
-space, `Alloc` should run the garbage collector. If after the garbage
+object, aka the header word. The header word will be set so that, bits 0--7 is
+the number of fields, bits 8--30 is a bitvector indicating which fields are
+pointers and bit 31 is always set to 1. Such interface is established between the
+compiler and the garbage collector.
+
+If there is not enough space for the new object
+in from space, `Alloc` should run the garbage collector. If after the garbage
 collection, there still is not enough space, `Alloc` should throw an
 `OutOfMemoryError`.
 
 The garbage collector will walk the stack to get the root set and it will copy
 the reachable objects into `to` space, starting from the root set. Finally, it
-will swap the pointers to the `from` and `to` spaces. You will need to create
-helper functions for these functions. Please see the lectures for the object
-representation, walking the stack, and other implementation details.
+will swap the pointers to the `from` and `to` spaces.
 
 After a garbage collection is finished, the garbage collector should call the
 `ReportGCStats` function to report the number and the total size in words of
 live objects after garbage collection (the garbage collector will need to
 compute this information each time it's run). We will use this information to
-test and grade your garbage collector.
+test and evaluate the garbage collector.
 
-### Constructor
-
-Preconditions:
-
-- Base frame pointer should not be a `nullptr`.
-- Heap size should be positive and even.
-- `sizeof(intptr_t) = 4` (i.e. words are 4-byte long). Otherwise, it
-  means you are not compiling your code for a 32-bit machine.
-
-### Alloc
-
-Preconditions:
-
-- `num_words > 0`
-- Your bump pointer should point to somewhere in the from space
-  (i.e. the interval `[start of from space, start of from space +
-  semispace size)`).
-
-### Root set traversal (stack walking)
-
-- At each step of walking the stack (when reading a new frame
-  pointer), current frame pointer should point to somewhere between
-  the base frame pointer and the stack pointer (i.e. it should be in
-  the interval `[stack_ptr, base_frame_ptr]`, this interval is
-  backwards because the stack grows downward.
-  
-### Copying phase
-
-- Each heap pointer passed to the copy function should point to
-  somewhere in the from space (i.e. the interval `[start of from
-  space, start of from space + semispace size)`).
   
 ## Mark Sweep Garbage Collector
 TODO
