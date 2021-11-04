@@ -6,7 +6,17 @@ written in a simple, self-developed programing language L2.
 
 ## L2 Language Concrete Syntax
 
-See L2-concrete-syntax.pdf
+See https://github.com/DennisZZH/CS263_Project_Garbage_Collector/blob/main/L2-concrete-syntax.pdf
+
+## L2 Compiler Front End
+
+The front end consists of a lexer that turn a L2 program into a sequence of tokens, and a 
+recursive descent parser that further parse the sequence of tokens into an abstract syntax tree.
+
+## L2 Compiler Back End
+
+The back end consists of a code generator that takes an abstract syntax tree as input and 
+generates a list of x86 assembly instructions.
 
 ## x86 Resources
 
@@ -18,15 +28,14 @@ with markers for registers (like EAX is denoted with `%eax`) and
 constants (e.g., 0 is `$0`).
 
 - x86 Assembly Wikibook: https://en.wikibooks.org/wiki/X86_Assembly
-- An x86 instruction reference, you will not need most of the
+- An x86 instruction reference, we do not need most of the
   instructions here but it is useful for checking out how the
-  instructions you want to use work: https://c9x.me/x86/
+  instructions work: https://c9x.me/x86/
   
 ## Semi Space Garbage Collector
 
-We implemented the semi-space garbage collector in class `GcSemiSpace`. The
-interfaces we implemented are the constructor and the `Alloc`
-method.
+We implemented a semi-space garbage collector for L2 in class `GcSemiSpace`. The
+interfaces we implemented are the constructor and the `Alloc` method.
 
 The constructor takes the frame pointer for the base of the stack and size of
 the whole heap in terms of words. It should keep track of the given stack base
