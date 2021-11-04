@@ -2,6 +2,8 @@
 
 #include <string>
 #include <unordered_set>
+#include <vector>
+#include <map>
 
 // Called by the garbage collector after each collection to report the
 // statistics about the heap after garbage collection.
@@ -36,4 +38,26 @@ class GcSemiSpace {
  private:
   // Your private methods for functionality such as garbage
   // collection, stack walking, and copying live data should go here
+
+  intptr_t* base_frame_ptr;
+
+  int heap_size;
+  intptr_t *heap_space, *from_space, *to_space;
+
+  int from_size;
+  int to_size;
+  intptr_t* bump_ptr;
+
+  std::map<intptr_t*, int> obj_map;
+  std::map<intptr_t*, int> new_map;
+  std::vector<intptr_t*> root_set;    // memory locations (on stack) of a pointer (to heap)
+
+  size_t num_obj_copied, num_word_copied;
+
+  void stack_walk(intptr_t* curr_frame_ptr);
+  void copy_space_on_rootset();
+  void copy_space_on_struct(intptr_t* obj_ptr);
+  void info_word_bit_mask(int info_word, intptr_t* curr_frame_ptr, int word_offset);
+  bool isCopied(intptr_t* obj_ptr);
+  void add_forwarding_ptr(intptr_t* obj_ptr, intptr_t* forwarding_ptr);
 };
