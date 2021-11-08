@@ -220,3 +220,100 @@ void GcSemiSpace::copy_space_on_struct(intptr_t* obj_ptr) {
     bitvector >>= 1;
   }
 }
+
+/*----------------------------------------------------------------------------*/
+
+GcMarkSweep::GcMarkSweep(intptr_t* frame_ptr, int heap_size_in_words) {
+  // Initialize GC data structures and allocate space for the heap here
+  base_frame_ptr = frame_ptr;
+  heap_size = heap_size_in_words;
+  heap_space = (intptr_t*) malloc(heap_size * 4);
+  free_size = heap_size * 4;
+  free_list.push_back(std::make_pair(heap_space, free_size));
+}
+
+intptr_t* GcMarkSweep::Alloc(int32_t num_words, intptr_t * curr_frame_ptr) {
+  intptr_t* obj_ptr;
+  // Try to find a memory block large enough for 'num_words'
+  auto block_iter = find_free_block(num_words);
+
+  if (block_iter != free_list.end()) {
+    // Allocate memory
+    obj_ptr = allocate_memory(block_iter, num_words);
+
+  } else {
+    // Prepare the root set by walking the stack
+    stack_walk(curr_frame_ptr);
+
+    // Mark memory blocks in the root set and sweep all other blocks
+    // TODO
+
+    // Report Gc status 
+    ReportGCStats(num_obj_copied, num_word_copied);
+    num_obj_copied = 0;
+    num_word_copied = 0;
+
+    // If still no enough space after Gc, throw 'OutOfMemoryError'
+    if (free_size < num_words * 4) throw OutOfMemoryError();
+
+    // Try to find a memory block large enough again after garbage collection
+    block_iter = find_free_block(num_words);
+
+    if (block_iter != free_list.end()) {
+      // Allocate memory
+      obj_ptr = allocate_memory(block_iter, num_words);
+
+    } else {
+      // Coalesce free memory
+      coalesce_free_list();
+
+      // Try find available again after coalsecing
+      block_iter = find_free_block(num_words);
+
+      if (block_iter != free_list.end()) {
+        // Allocate memory
+        obj_ptr = allocate_memory(block_iter, num_words);
+      } else {
+        throw OutOfMemoryError();
+      }
+    }
+  }
+
+  return obj_ptr;
+}
+
+std::list<std::pair<intptr_t*, int>>::iterator 
+  GcMarkSweep::find_free_block(int num_words) {
+  int num_bytes = (num_words + 1) * 4;
+
+  for (auto iter = free_list.begin(); iter != free_list.end(); iter++) {
+    if (iter->second >= num_bytes) return iter;
+  }
+
+  return free_list.end();
+}
+
+intptr_t* GcMarkSweep::allocate_memory(std::list<std::pair<intptr_t*, int>>
+                                         ::iterator block_iter,
+                                       int32_t num_words) {
+  // Allocate memory
+  intptr_t* obj_ptr = block_iter->first + 1;
+
+  int leftover_size = block_iter->second - 4 * (num_words + 1);
+  intptr_t* leftover_ptr = block_iter->first + num_words + 1;
+  // If the remaining block is not empty, put it back into the free_list.
+  if (leftover_size != 0) {
+    free_list.push_back(std::make_pair(leftover_ptr, leftover_size));
+  }
+  // Erase the used block
+  free_list.erase(block_iter);
+
+  return obj_ptr;
+}
+
+void GcMarkSweep::stack_walk(intptr_t* curr_frame_ptr) {}
+
+void GcMarkSweep::info_word_bit_mask(int info_word, intptr_t* curr_frame_ptr,
+                        int word_offset) {}
+
+void GcMarkSweep::coalesce_free_list() {}
