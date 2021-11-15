@@ -228,7 +228,7 @@ GcMarkSweep::GcMarkSweep(intptr_t* frame_ptr, int heap_size_in_words) {
   base_frame_ptr = frame_ptr;
   heap_size = heap_size_in_words;
   heap_space = (intptr_t*) malloc(heap_size * 4);
-  free_size = heap_size * 4;
+  free_size = heap_size;
   free_list.push_back(std::make_pair(heap_space, free_size));
 }
 
@@ -238,14 +238,17 @@ intptr_t* GcMarkSweep::Alloc(int32_t num_words, intptr_t * curr_frame_ptr) {
   auto block_iter = find_free_block(num_words);
 
   if (block_iter != free_list.end()) {
-    // Allocate memory
+    // Allocate memory for the object
     obj_ptr = allocate_memory(block_iter, num_words);
-
   } else {
     // Prepare the root set by walking the stack
     stack_walk(curr_frame_ptr);
 
-    // Mark memory blocks in the root set and sweep all other blocks
+    // Mark and sweep
+    // Turn the root set into a std list
+    // For every block in obj_list, check it exists in the root set
+    // If not, delete the block from obj_list and add its space back to
+    // free_list. Otherwise do nothing.
     // TODO
 
     // Report Gc status 
@@ -253,27 +256,27 @@ intptr_t* GcMarkSweep::Alloc(int32_t num_words, intptr_t * curr_frame_ptr) {
     num_obj_copied = 0;
     num_word_copied = 0;
 
-    // If still no enough space after Gc, throw 'OutOfMemoryError'
-    if (free_size < num_words * 4) throw OutOfMemoryError();
+    // No enough space after Gc. Throw 'OutOfMemoryError' because memory ran out
+    if (free_size < num_words) throw OutOfMemoryError();
 
     // Try to find a memory block large enough again after garbage collection
     block_iter = find_free_block(num_words);
 
     if (block_iter != free_list.end()) {
-      // Allocate memory
+      // Allocate memory for the object
       obj_ptr = allocate_memory(block_iter, num_words);
-
     } else {
       // Coalesce free memory
       coalesce_free_list();
-
-      // Try find available again after coalsecing
+      // Try find available space again after coalsecing
       block_iter = find_free_block(num_words);
 
       if (block_iter != free_list.end()) {
-        // Allocate memory
+        // Allocate memory for the object
         obj_ptr = allocate_memory(block_iter, num_words);
       } else {
+        // No enough space after coalesce.
+        // Throw 'OutOfMemoryError' due to external fregamentation
         throw OutOfMemoryError();
       }
     }
@@ -284,12 +287,11 @@ intptr_t* GcMarkSweep::Alloc(int32_t num_words, intptr_t * curr_frame_ptr) {
 
 std::list<std::pair<intptr_t*, int>>::iterator 
   GcMarkSweep::find_free_block(int num_words) {
-  int num_bytes = (num_words + 1) * 4;
-
+  // First fit algorithm
+  int target_size = num_words + 1;
   for (auto iter = free_list.begin(); iter != free_list.end(); iter++) {
-    if (iter->second >= num_bytes) return iter;
+    if (iter->second >= target_size) return iter;
   }
-
   return free_list.end();
 }
 
@@ -299,21 +301,57 @@ intptr_t* GcMarkSweep::allocate_memory(std::list<std::pair<intptr_t*, int>>
   // Allocate memory
   intptr_t* obj_ptr = block_iter->first + 1;
 
-  int leftover_size = block_iter->second - 4 * (num_words + 1);
+  int leftover_size = block_iter->second - (num_words + 1);
   intptr_t* leftover_ptr = block_iter->first + num_words + 1;
-  // If the remaining block is not empty, put it back into the free_list.
+  // Erase the used block
+  free_list.erase(block_iter);
+  // Put back the remaining free block into the free_list.
   if (leftover_size != 0) {
     free_list.push_back(std::make_pair(leftover_ptr, leftover_size));
   }
-  // Erase the used block
-  free_list.erase(block_iter);
+  // Decrease free size
+  free_size -= num_words + 1;
+  // Put allocated block into obj_list
+  obj_list.push_back(std::make_pair(obj_ptr, num_words));
 
   return obj_ptr;
 }
 
-void GcMarkSweep::stack_walk(intptr_t* curr_frame_ptr) {}
+void GcMarkSweep::stack_walk(intptr_t* curr_frame_ptr) {
+  root_set.clear();
+  intptr_t *aiw_ptr, *liw_ptr;
+
+  while (curr_frame_ptr != base_frame_ptr) {
+    aiw_ptr = curr_frame_ptr - 1;
+    info_word_bit_mask(*aiw_ptr, curr_frame_ptr, 2);
+
+    liw_ptr = curr_frame_ptr - 2;
+    info_word_bit_mask(*liw_ptr, curr_frame_ptr, -3);
+
+    curr_frame_ptr = (intptr_t*) *curr_frame_ptr;
+  }
+}
 
 void GcMarkSweep::info_word_bit_mask(int info_word, intptr_t* curr_frame_ptr,
-                        int word_offset) {}
+                        int word_offset) {
+  int is_ptr, bit_num = 0;
+  while (info_word != 0) {
+    // mask out the right most bit of info word
+    is_ptr = info_word & 0x0001;
+  
+    if (is_ptr == 1)  {
+      if (word_offset > 0) {
+        // if it is a argument info word
+        root_set.push_back(curr_frame_ptr + word_offset + bit_num);
+      } else {
+        // if it is a local info word
+        root_set.push_back(curr_frame_ptr + word_offset - bit_num);
+      }
+    }
+
+    bit_num++;
+    info_word >>= 1;
+  }
+}
 
 void GcMarkSweep::coalesce_free_list() {}

@@ -94,11 +94,17 @@ class GcMarkSweep {
 
  private:
   intptr_t* base_frame_ptr;
+  // Size of the allocated heap
   int heap_size;
+  // Pointer to the allocated heap
   intptr_t* heap_space;
+  
+  // Total currently available memory size  
   int free_size;
-  // A free list for managing free memory
+  // A free list that manages free memory
   std::list<std::pair<intptr_t*, int>> free_list;
+  // A object list that keeps track of allocated object
+  std::list<std::pair<intptr_t*, int>> obj_list;
 
   std::vector<intptr_t*> root_set;
 
