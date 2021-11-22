@@ -1,4 +1,4 @@
-CXX=g++-8
+CXX=g++
 
 # Flags for compiler
 CXXFLAGS=-std=c++17 -Wall -I. -fPIC -g -O3
@@ -85,3 +85,5 @@ test: build/token_test build/lexer_test build/parser_test build/codegen_test
 
 clean:
 	rm -f build/*
+	rm -f tests/*.exe tests/*.asm tests/*.o
+	rm -f my_GC_stats.txt

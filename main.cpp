@@ -17,7 +17,7 @@ void usage(char const* programName) {
 const std::string OnlyGenAsm{"--gen-asm-only"};
 
 // C++ compiler. We use it as linker. GCC's C++ compier is usually named `g++` on most systems.
-const std::string CPPCompiler{"g++-8"};
+const std::string CPPCompiler{"g++"};
 
 // Name of the assembler program. GNU assembler is usually named `as` on most systems.
 const std::string Assembler{"as"};

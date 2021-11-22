@@ -6,6 +6,8 @@
 #include <vector>
 #include <map>
 #include <list>
+#include <stdexcept>
+	
 
 // Called by the garbage collector after each collection to report the
 // statistics about the heap after garbage collection.
@@ -107,7 +109,7 @@ class GcMarkSweep {
   // A object list that keeps track of allocated object
   std::list<std::pair<intptr_t*, int>> obj_list;
   // A map that map heap adress to a block in the free_list
-  std::unordered_map<intptr_t*, std::list<std::pair<intptr_t*, int>>> free_map;
+  std::unordered_map<intptr_t*, std::list<std::pair<intptr_t*, int>>::iterator> free_map;
 
   std::vector<intptr_t*> root_set;
 
