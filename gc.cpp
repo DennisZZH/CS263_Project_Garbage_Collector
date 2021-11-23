@@ -1,3 +1,4 @@
+/* Author: Zihao Zhang */
 #include "gc.h"
 
 #include <cassert>
@@ -244,26 +245,45 @@ intptr_t* GcMarkSweep::Alloc(int32_t num_words, intptr_t *curr_frame_ptr) {
   } else {
     // Prepare the root set by walking the stack
     stack_walk(curr_frame_ptr);
+    // TODO: Recursively track all sturct fields, if pointer add to root set.
 
-    // Mark and sweep
+    /*** Mark and Sweep ***/
     // Turn the root set into a std unordered_set
-    unordered_set<intptr_t*> root_hashset(root_set.begin(), root_set.end());
+    std::cout << "size of root set = " << root_set.size() << std::endl;
+    unordered_set<intptr_t*> root_hashset;
+    for (unsigned int i = 0; i < root_set.size(); i++) {
+      intptr_t *root_ptr = root_set[i];
+      std::cout << "root set # " << root_ptr << std::endl;
+      intptr_t *obj_ptr = (intptr_t*) *root_ptr;
+      std::cout << "root hash set # " << obj_ptr << std::endl;
+      root_hashset.insert(obj_ptr);
+    }
+   std::cout << "size of root hash set = " << root_hashset.size() << std::endl;
     // For every block in obj_list, check it exists in the root set. If not,
     // delete the block from obj_list and add its space back to free_list.
-    for (auto iter = obj_list.begin(); iter != obj_list.end(); iter++) {
+    for (auto iter = obj_list.begin(); iter != obj_list.end();) {
+      std::cout << 4444444 << std::endl;
+      std::cout << "obj list # " << iter->first << std::endl;
       if (root_hashset.find(iter->first) == root_hashset.end()) {
+        std::cout << 444 << std::endl;
         free_list.push_front(std::make_pair(iter->first - 1, iter->second + 1));
         free_map.insert(std::make_pair(iter->first - 1, free_list.begin()));
         free_size += iter->second + 1;
-        num_obj_collected++;
-        num_word_collected += iter->second + 1;
-        obj_list.erase(iter);
+        auto tmp = iter++;
+        obj_list.erase(tmp);
+      } else {
+        iter++;
       }
     }
-    // Report Gc status 
-    ReportGCStats(num_obj_collected, num_word_collected);
-    num_obj_collected = 0;
-    num_word_collected = 0;
+ 
+    // Report Gc status
+    for (auto iter = obj_list.begin(); iter != obj_list.end(); iter++) {
+      num_obj_left++;
+      num_word_left += iter->second + 1;
+    }
+    ReportGCStats(num_obj_left, num_word_left);
+    num_obj_left = 0;
+    num_word_left = 0;
 
     // No enough space after Gc. Throw 'OutOfMemoryError' because memory ran out
     if (free_size < num_words) throw OutOfMemoryError();
@@ -271,7 +291,7 @@ intptr_t* GcMarkSweep::Alloc(int32_t num_words, intptr_t *curr_frame_ptr) {
     // Try to find a memory block large enough again after garbage collection
     block_iter = find_free_block(num_words);
 
-    if (block_iter != free_list.end()) {
+    if (block_iter != free_list.end()) {;
       // Allocate memory for the object
       obj_ptr = allocate_memory(block_iter, num_words);
     } else {

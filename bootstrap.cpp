@@ -5,7 +5,8 @@
 #include <iostream>
 
 // The runtime memory manager.
-GcSemiSpace *gc;
+// GcSemiSpace *gc;
+GcMarkSweep *gc;
 
 // 'Entry' is the entry point of an L2 program.
 extern "C" {
@@ -37,7 +38,11 @@ int main(int argc, char *argv[]) {
   }
 
   // Initialize the garbage collector.
-  gc = new GcSemiSpace(/*frame_ptr=*/(intptr_t *)__builtin_frame_address(0),
+
+  // gc = new GcSemiSpace(/*frame_ptr=*/(intptr_t *)__builtin_frame_address(0),
+  //                      /*heap_sizein_words=*/atoi(argv[1]));
+
+  gc = new GcMarkSweep(/*frame_ptr=*/(intptr_t *)__builtin_frame_address(0),
                        /*heap_sizein_words=*/atoi(argv[1]));
 
   // Run the L2 program.

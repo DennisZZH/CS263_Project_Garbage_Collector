@@ -1,3 +1,4 @@
+/* Author: Zihao Zhang */
 #include <stdint.h>
 
 #include <string>
@@ -114,7 +115,7 @@ class GcMarkSweep {
   std::vector<intptr_t*> root_set;
 
   // Variables needed for Gc Stat Report
-  size_t num_obj_collected, num_word_collected;
+  size_t num_obj_left, num_word_left;
 
   // Helper function that finds a free memory block larger or equal to
   // 'num_words' + 1. If 'num_words' + 1 is greater than the available
