@@ -245,27 +245,15 @@ intptr_t* GcMarkSweep::Alloc(int32_t num_words, intptr_t *curr_frame_ptr) {
   } else {
     // Prepare the root set by walking the stack
     stack_walk(curr_frame_ptr);
-    // TODO: Recursively track all sturct fields, if pointer add to root set.
+    // Turn the root set into a hashset
+    // Recursively track all object fields, if pointer add to hashset.
+    unordered_set<intptr_t*> root_hashset = get_root_hashset();
 
     /*** Mark and Sweep ***/
-    // Turn the root set into a std unordered_set
-    std::cout << "size of root set = " << root_set.size() << std::endl;
-    unordered_set<intptr_t*> root_hashset;
-    for (unsigned int i = 0; i < root_set.size(); i++) {
-      intptr_t *root_ptr = root_set[i];
-      std::cout << "root set # " << root_ptr << std::endl;
-      intptr_t *obj_ptr = (intptr_t*) *root_ptr;
-      std::cout << "root hash set # " << obj_ptr << std::endl;
-      root_hashset.insert(obj_ptr);
-    }
-   std::cout << "size of root hash set = " << root_hashset.size() << std::endl;
-    // For every block in obj_list, check it exists in the root set. If not,
-    // delete the block from obj_list and add its space back to free_list.
+    // For every block in obj_list, check it exists in the root hashset. If not,
+    // delete the block from obj_list and return its space to free_list.
     for (auto iter = obj_list.begin(); iter != obj_list.end();) {
-      std::cout << 4444444 << std::endl;
-      std::cout << "obj list # " << iter->first << std::endl;
       if (root_hashset.find(iter->first) == root_hashset.end()) {
-        std::cout << 444 << std::endl;
         free_list.push_front(std::make_pair(iter->first - 1, iter->second + 1));
         free_map.insert(std::make_pair(iter->first - 1, free_list.begin()));
         free_size += iter->second + 1;
@@ -384,6 +372,51 @@ void GcMarkSweep::info_word_bit_mask(int info_word, intptr_t *curr_frame_ptr,
     info_word >>= 1;
   }
 }
+
+unordered_set<intptr_t*> GcMarkSweep::get_root_hashset() {
+    unordered_set<intptr_t*> root_hashset;
+
+    for (unsigned int i = 0; i < root_set.size(); i++) {
+      intptr_t *root_ptr = root_set[i];
+      intptr_t *obj_ptr = (intptr_t*) *root_ptr;
+
+      if (obj_ptr == NULL) continue;
+
+      root_hashset.insert(obj_ptr);
+      trace_obj_fields(obj_ptr, root_hashset);
+    }
+
+    return root_hashset;
+}
+
+void GcMarkSweep::trace_obj_fields(intptr_t* obj_ptr, 
+                                   unordered_set<intptr_t*> &root_hashset) {
+  intptr_t *head_ptr = obj_ptr - 1;
+  int head = *head_ptr;
+  int num_fields = head >> 24;
+  int bitvector = (head << 8) >> 9;
+  int last_bit;
+  intptr_t *field_ptr;
+
+  for (int i = 0; i < num_fields; i++) {
+    last_bit = bitvector & 0x0001;
+
+    if (last_bit == 1) {
+      // that field is a pointer, add it to root_hashset
+      field_ptr = (intptr_t*) *(obj_ptr + i);
+      if (field_ptr == NULL) {
+        bitvector >>= 1;
+        continue;
+      }
+      root_hashset.insert(field_ptr);
+      // recursively check its fields
+      trace_obj_fields(field_ptr, root_hashset);
+    }
+
+    bitvector >>= 1;
+  }
+}
+
 
 void GcMarkSweep::coalesce_free_list() {
   // For every block in the free_list, check if its next abutting block is free.

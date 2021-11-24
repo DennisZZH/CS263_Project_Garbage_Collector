@@ -137,6 +137,13 @@ class GcMarkSweep {
   void info_word_bit_mask(int info_word, intptr_t *curr_frame_ptr,
                           int word_offset);
 
+  // Helper function that turns the root set into a hashset
+  std::unordered_set<intptr_t*> get_root_hashset();
+
+  // Helper function that recursively traces all object fields,
+  // if pointer add to hashset.
+  void trace_obj_fields(intptr_t* obj_ptr, std::unordered_set<intptr_t*> &root_hashset);
+
   // Helper function that coalesce free memory. Scan the freelist to find
   // abutting free blocks, then merge the those blocks together into a single
   // block.
