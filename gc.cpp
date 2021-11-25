@@ -422,6 +422,11 @@ void GcMarkSweep::coalesce_free_list() {
   // For every block in the free_list, check if its next abutting block is free.
   // If so, merge this block with its next abutting block. Else, check next
   // block in the free_list.
+  std::cout << "Before coalesce: "
+            << "free size = " << free_size
+            << ", #free block = " << free_list.size() 
+            << std::endl;
+
   for (auto iter = free_list.begin(); iter != free_list.end();) {
     intptr_t* abutting_block_addr = iter->first + iter->second;
 
@@ -433,5 +438,10 @@ void GcMarkSweep::coalesce_free_list() {
     } else {
       iter++;
     }
-  } 
+  }
+
+  std::cout << "After coalesce: "
+            << "free size = " << free_size
+            << ", #free block = " << free_list.size() 
+            << std::endl;
 }

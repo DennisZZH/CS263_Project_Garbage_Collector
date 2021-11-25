@@ -1,0 +1,26 @@
+struct %list { int num; %list next; };
+struct %quad { int n1; int n2; int n3; int n4; };
+
+def foo() : int {
+  %list bar;
+  bar := new %list;
+  bar.next := new %list;
+  return 0;
+}
+
+%list head;
+int cntr;
+int dummy;
+%quad myq;
+
+head := new %list;
+head.next := new %list;
+
+dummy := foo();
+dummy := foo();
+dummy := foo();
+dummy := foo();
+
+myq := new %quad;
+
+output 42;
