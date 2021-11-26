@@ -108,9 +108,17 @@ guaranteed to be correct if you are using a different architecture or
 operating system.
 
  - To compile the bootstrap code and the GC, simply run `make`.
- - To build a test program named `test.asm`, you need to first
-   assemble it then link it against your GC.
-
+ - To build the all sample tests in the /tests folder, simply run
+   ```
+   ./compile_tests.sh
+   ```
+ - To build a customized test program named `test.l2`, you need to first
+   compile it ,assemble it then link it against your GC.
+   
+   0. To compile `test.l2` to 'test.asm', you can run the following command:
+      ```
+      ./build/c2 <input-L2-program> --gen-asm-only <output-asm-file>
+      ```
    1. To assemble `test.asm` to `test.o`, you can run the following
       command:
       ```
@@ -119,19 +127,15 @@ operating system.
    2. To link the resulting object file with the bootstrap and the GC
       code, you can run the following command:
       ```
-      g++ -m32
-      build/bootstrap.o build/gc.o test2.l2.exe.o -o test2.l2.exe
+      g++ -m32 build/bootstrap.o build/gc.o test2.l2.exe.o -o test2.l2.exe
       ```
-      You can replace `g++` with the g++ executable installed on
-      your system.
 
 You can also give `make` argument `-jN` to run up to `N` processes
 while building your code. This can reduce build times especially if
 you just ran `make clean`.
 
-The `Makefile` provided to you uses `g++` as the C++ compiler. We will
-use `g++` to compile your code on GradeScope. The template we provided
-works on CSIL as is so you do not need to change the compiler on CSIL.
+The `Makefile` provided uses `g++` as the C++ compiler. The code
+works on CSIL.
 
 ## How to test the garbage collector
 
