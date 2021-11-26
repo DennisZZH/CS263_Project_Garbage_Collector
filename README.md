@@ -1,8 +1,7 @@
 # Project: Garbage Collectors for A Simple Progamming Language L2
 
 In this Project, we are going to implement a semi-space garbage collector, a
-mark-sweep garbage collector and a generational garbage collector for programs
-written in a simple, self-developed programing language L2.
+mark-sweep garbage collector for programs written in a simple, self-developed programing language L2.
 
 ## L2 Language Concrete Syntax
 
@@ -93,9 +92,6 @@ meta-data—otherwise we don’t know whether the abutting block (as opposed to 
 is free or not. Also we cannot coalesce memory by moving allocated regions of memory around,
 this would invalidate the addresses being used by the executing program.
 
-
-## Generational Garbage Collector
-TODO
 
 ## How to build the project
 
