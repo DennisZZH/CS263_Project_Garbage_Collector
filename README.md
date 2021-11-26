@@ -1,4 +1,4 @@
-# Project: Garbage Collectors for A Simple Progaming Language L2
+# Project: Garbage Collectors for A Simple Progamming Language L2
 
 In this Project, we are going to implement a semi-space garbage collector, a
 mark-sweep garbage collector and a generational garbage collector for programs
