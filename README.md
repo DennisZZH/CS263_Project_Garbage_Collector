@@ -115,16 +115,16 @@ operating system.
  - To build a customized test program named `test.l2`, you need to first
    compile it ,assemble it then link it against your GC.
    
-   0. To compile `test.l2` to 'test.asm', you can run the following command:
+   1. To compile `test.l2` to 'test.asm', you can run the following command:
       ```
       ./build/c2 <input-L2-program> --gen-asm-only <output-asm-file>
       ```
-   1. To assemble `test.asm` to `test.o`, you can run the following
+   2. To assemble `test.asm` to `test.o`, you can run the following
       command:
       ```
       as --32 -g test.asm -o test.o
       ```
-   2. To link the resulting object file with the bootstrap and the GC
+   3. To link the resulting object file with the bootstrap and the GC
       code, you can run the following command:
       ```
       g++ -m32 build/bootstrap.o build/gc.o test2.l2.exe.o -o test2.l2.exe
